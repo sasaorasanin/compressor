@@ -1,5 +1,7 @@
 package eu.nites.compressor.controllers;
 
+import eu.nites.compressor.models.Compress;
+import eu.nites.compressor.models.Decompress;
 import eu.nites.compressor.models.Hash;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,16 +23,15 @@ public class CompressorController {
     @RequestMapping(value = "/compress-file", method = RequestMethod.POST)
     public String compress(@RequestParam(name = "file", required = true) MultipartFile file, Model model) throws IOException {
         String crc = Hash.make(file);
-        model.addAttribute("link", crc);
+        Compress compress = new Compress(file, crc);
+        model.addAttribute("link", compress.getLink());
         return "download";
     }
 
     @RequestMapping(value = "/decompress-file", method = RequestMethod.POST)
     public String decompress(@RequestParam(name = "file", required = true) MultipartFile file, Model model) throws IOException {
-        String crc = Hash.make(file);
-
-
-        model.addAttribute("link", crc);
+        Decompress decompress = new Decompress(file);
+        model.addAttribute("link", decompress.getLink());
         return "download";
     }
 

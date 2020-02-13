@@ -1,7 +1,9 @@
 package eu.nites.compressor.models;
 
-public class Decompress {
-    public Decompress () {
+import org.springframework.web.multipart.MultipartFile;
 
+public class Decompress extends Compress {
+    public Decompress (MultipartFile file) {
+        super(file, "");
     }
 }

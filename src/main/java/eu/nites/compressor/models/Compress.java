@@ -1,7 +1,17 @@
 package eu.nites.compressor.models;
 
-public class Compress {
-    public Compress () {
+import org.springframework.web.multipart.MultipartFile;
 
+public class Compress {
+    private MultipartFile file;
+    private String code;
+
+    public Compress (MultipartFile file, String code) {
+        this.file = file;
+        this.code = code;
+    }
+
+    public String getLink () {
+        return this.code;
     }
 }
