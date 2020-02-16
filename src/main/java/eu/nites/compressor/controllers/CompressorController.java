@@ -25,7 +25,11 @@ public class CompressorController {
     @RequestMapping(value = "/decompress-file", method = RequestMethod.POST)
     public String decompress(@RequestParam(name = "file", required = true) MultipartFile file, Model model) throws IOException {
         Decompress decompress = new Decompress(file);
-        model.addAttribute("link", decompress.getLink());
-        return "download";
+        if (decompress.checkHash()) {
+            model.addAttribute("link", decompress.getLink());
+            return "download";
+        }
+        model.addAttribute("message", "File was not decompressed correctly, it may be broken.");
+        return "error";
     }
 }

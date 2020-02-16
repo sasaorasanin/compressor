@@ -84,8 +84,8 @@ public class Compress {
         for(char c : this.stringAsChars.keySet()) {
             Float prev = (float) 0;
             if (i > 0) {
-                for (char p:probabilities.get(i-1).keySet()) {
-                    prev = probabilities.get(i-1).get(p);
+                for (char p:this.probabilities.get(i-1).keySet()) {
+                    prev = this.probabilities.get(i-1).get(p);
                 }
             }
             Map<Character, Float> value = new HashMap<>();
@@ -107,9 +107,11 @@ public class Compress {
                 new FileOutputStream("./src/main/resources/static/storage/" + filename), "utf-8"))) {
             Random r = new Random();
             float random = this.range[0] + r.nextFloat() * (this.range[1] - this.range[0]);
-            writer.write( this.code + "##" + this.probabilities.toString() + "##" + random);
+            writer.write( this.code + "##" + random + "##" + this.chars.length + "##");
             for(int i = 0; i < this.probabilities.size(); i++) {
-                //writer.write();
+                char pro_key = this.probabilities.get(i).keySet().toArray()[0].toString().charAt(0);
+                Float probability = this.probabilities.get(i).get(pro_key);
+                writer.write(i + "=>" + pro_key + "<>" + probability + "<=");
             }
 
             this.filename = filename;
