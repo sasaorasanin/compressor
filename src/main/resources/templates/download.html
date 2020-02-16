@@ -5,6 +5,7 @@
         <title>Download File</title>
     </head>
     <body>
-        <a th:href="@{'../storage/'+${link}+'.txt'}" target="_blank" download>Download File</a>
+    <a th:href="@{'./storage/'+${link}}" target="_blank" download>Download File</a>
+    <a th:href="@{./storage/compress1581599343.txt}" target="_blank" download>Download File</a>
     </body>
 </html>

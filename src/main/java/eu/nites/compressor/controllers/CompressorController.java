@@ -14,12 +14,6 @@ import java.io.IOException;
 
 @Controller
 public class CompressorController {
-    @RequestMapping("/sasa")
-    public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
-        model.addAttribute("name", name);
-        return "home";
-    }
-
     @RequestMapping(value = "/compress-file", method = RequestMethod.POST)
     public String compress(@RequestParam(name = "file", required = true) MultipartFile file, Model model) throws IOException {
         String crc = Hash.make(file);
@@ -34,6 +28,4 @@ public class CompressorController {
         model.addAttribute("link", decompress.getLink());
         return "download";
     }
-
-
 }
