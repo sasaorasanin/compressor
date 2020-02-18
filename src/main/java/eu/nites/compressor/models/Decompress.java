@@ -1,19 +1,23 @@
 package eu.nites.compressor.models;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Decompress {
     private MultipartFile file;
-    private Float decodeNumber;
+    private Double decodeNumber;
     private int charsCount = 0;
-    private Map<Integer, Map<Character, Float>> probabilities = new HashMap<>();
-    private Map<Integer, Map<Character, Float[]>> rangeValues = new HashMap<>();
-    private Float[] range = new Float[]{(float) 0, (float) 1};
+    private Map<Integer, Map<Character, Double>> probabilities = new HashMap<>();
+    private Map<Integer, Map<Character, Double[]>> rangeValues = new HashMap<>();
+    private Double[] range = new Double[]{(double) 0, (double) 1};
     private String code;
     private String filename;
     private String outputString = "";
@@ -45,35 +49,27 @@ public class Decompress {
 
     private void chooseRange () {
         for (int i = 0; i < this.rangeValues.size(); i++) {
-            for (char probability:this.rangeValues.get(i).keySet()) {
-                if (this.decodeNumber > this.rangeValues.get(i).get(probability)[0] && this.decodeNumber <= this.rangeValues.get(i).get(probability)[1]) { // umesto for-a this.rangeValues.get(i).get(character)
-                    this.range = new Float[]{this.rangeValues.get(i).get(probability)[0], this.rangeValues.get(i).get(probability)[1]};
-                    this.outputString += probability;
-                    System.out.println(probability + "==" + this.rangeValues.get(i).get(probability)[0] +"-"+ this.rangeValues.get(i).get(probability)[1]);
-                }
+            char probability = this.rangeValues.get(i).keySet().toArray()[0].toString().charAt(0);
+            if (this.decodeNumber > this.rangeValues.get(i).get(probability)[0] && this.decodeNumber <= this.rangeValues.get(i).get(probability)[1]) { // umesto for-a this.rangeValues.get(i).get(character)
+                this.range = new Double[]{this.rangeValues.get(i).get(probability)[0], this.rangeValues.get(i).get(probability)[1]};
+                this.outputString += probability;
             }
         }
     }
 
-    // Write new values between ranges and calculate it with probabilities, for range sort by value asc
-
     private void makeBetweenRangeValues () {
         this.rangeValues = new HashMap<>();
-        Float prev = this.range[0];
-
+        Double prev = this.range[0];
         for (int i = 0; i < this.probabilities.size(); i++) {
             char pro_key = this.probabilities.get(i).keySet().toArray()[0].toString().charAt(0);
-            Float probability = this.probabilities.get(i).get(pro_key);
-            Float new_upper_limit = this.range[0] + ( ( this.range[1] - this.range[0] ) * probability );
-            System.out.println("char(run): "+pro_key+" | char(probability): "+this.probabilities.get(i).keySet().toArray()[0]+" | prev: "+prev+" | new_upper_limit: "+new_upper_limit);
-
-            Map<Character, Float[]> range = new HashMap<>();
-            Float[] arr = new Float[] {prev, new_upper_limit};
+            Double probability = this.probabilities.get(i).get(pro_key);
+            Double new_upper_limit = this.range[0] + ( ( this.range[1] - this.range[0] ) * probability );
+            Map<Character, Double[]> range = new HashMap<>();
+            Double[] arr = new Double[] {prev, new_upper_limit};
             range.put(pro_key, arr);
             this.rangeValues.put(i, range);
             prev = new_upper_limit;
         }
-
         this.chooseRange();
 
     }
@@ -81,48 +77,38 @@ public class Decompress {
     private void makeFile () throws IOException {
         long time = new Date().getTime() / 1000;
         String filename = "decompress" + time + ".txt";
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream("./src/main/resources/static/storage/" + filename), "utf-8"))) {
-            writer.write(this.outputString);
-            this.filename = filename;
-        }
+        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./src/main/resources/static/storage/" + filename), "UTF-8"));
+        writer.write(this.outputString);
+        writer.close();
+        this.filename = filename;
     }
 
     private void fileToStringArray (MultipartFile file) throws IOException {
         String[] fileAsStringArray = new String(file.getBytes(), "UTF-8").split("##");
         if (fileAsStringArray.length == 4) {
             this.code = fileAsStringArray[0];
-            this.decodeNumber = Float.parseFloat(fileAsStringArray[1]);
+            this.decodeNumber = Double.parseDouble(fileAsStringArray[1]);
             this.charsCount = Integer.parseInt(fileAsStringArray[2]);
             this.makeProbabilities(fileAsStringArray[3]);
         } else {
-            // throw IOError;
+            throw new IllegalArgumentException("File cannot be decompressed!");
         }
     }
 
     private void makeProbabilities (String map) {
-        String[] firstMap = map.split("<=");
-        for(int i = 0; i < firstMap.length; i++) {
-            Float prev = (float) 0;
+        Gson gson = new GsonBuilder().create();
+        Type typeOfHashMap = new TypeToken<Map<Integer, Map<Character, Double>>>() {
+        }.getType();
+        this.probabilities = gson.fromJson(map, typeOfHashMap);
+        Double prev = this.range[0];
+        for (int i = 0; i < this.probabilities.size(); i++) {
             if (i > 0) {
-                for (char p:this.probabilities.get(i-1).keySet()) {
-                    prev = this.probabilities.get(i-1).get(p);
-                }
+                prev = this.probabilities.get(i - 1).get(this.probabilities.get(i - 1).keySet().toArray()[0]);
             }
-            String[] o = firstMap[i].split("=>");
-            int j = Integer.parseInt(o[0]);
-            String[] k = o[1].split("<>");
-            System.out.println(o[1]);
-            Map<Character, Float> value = new HashMap<>();
-            Map<Character, Float[]> range = new HashMap<>();
-            System.out.println(k[0]);
-            System.out.println(k[1]);
-            value.put(k[0].charAt(0), Float.parseFloat(k[1]));
-            Float[] arr = new Float[] {prev, Float.parseFloat(k[1])};
-            range.put(k[0].charAt(0), arr);
-            this.probabilities.put(j, value);
+            Map<Character, Double[]> range = new HashMap<>();
+            Double[] arr = new Double[]{prev, this.probabilities.get(i).get(this.probabilities.get(i).keySet().toArray()[0])};
+            range.put(this.probabilities.get(i).keySet().toArray()[0].toString().charAt(0), arr);
             this.rangeValues.put(i, range);
         }
     }
-
 }

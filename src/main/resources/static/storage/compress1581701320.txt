@@ -1,1 +1,0 @@
-d87f7e0c#{0={s=0.25}, 1={t=0.75}, 2={e=1.0}}#{0={s=[Ljava.lang.Float;@78f1fe04}, 1={t=[Ljava.lang.Float;@b5cfae5}, 2={e=[Ljava.lang.Float;@5d4ee818}}
