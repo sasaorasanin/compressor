@@ -36,6 +36,8 @@ public class Compress {
         return this.filename;
     }
 
+    // Choose new range for each character
+
     private void chooseRange (char character) {
         for (int i = 0; i < this.rangeValues.size(); i++) {
             for (char probability:this.rangeValues.get(i).keySet()) {
@@ -46,7 +48,7 @@ public class Compress {
         }
     }
 
-    // Write new values between ranges and calculate it with probabilities, for range sort by value asc
+    // Write new values between ranges and calculate it with probabilities
 
     private void makeBetweenRangeValues (char c) {
         this.rangeValues = new HashMap<>();
@@ -67,6 +69,8 @@ public class Compress {
 
     }
 
+    // Start making ranges for all probabilities and characters
+
     private void run () {
         for(int i = 0; i < this.chars.length; i++) {
             if (i == 0) {
@@ -76,6 +80,8 @@ public class Compress {
             }
         }
     }
+
+    // Make probabilities and first range values
 
     private void makeProbabilities () {
         int i = 0;
@@ -97,6 +103,8 @@ public class Compress {
         }
     }
 
+    // Write file after compressing data with Gson dependency
+
     private void makeFile () throws IOException {
         long time = new Date().getTime() / 1000;
         String filename = "compress" + time + ".txt";
@@ -110,9 +118,13 @@ public class Compress {
         this.filename = filename;
     }
 
+    // Convert uploaded file to string
+
     private void fileToString (MultipartFile file) throws IOException {
         this.fileAsString = new String(file.getBytes(), StandardCharsets.UTF_8);
     }
+
+    // Convert String to array of chars and make probabilities with distinct char values
 
     private void stringToChars (String string) {
         this.chars = string.toCharArray();

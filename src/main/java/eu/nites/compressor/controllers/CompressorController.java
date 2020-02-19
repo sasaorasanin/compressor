@@ -18,10 +18,9 @@ import java.io.IOException;
 @Controller
 public class CompressorController {
     @RequestMapping(value = "/compress-file", method = RequestMethod.POST)
-    public String compress(@RequestParam(name = "file", required = true) MultipartFile file, Model model) throws IOException {
+    public String compress(@RequestParam(name = "file", required = true) MultipartFile file) throws IOException {
         String crc = Hash.make(file);
         Compress compress = new Compress(file, crc);
-        //model.addAttribute("link", compress.getLink());
         return "redirect:/download?file=" + compress.getLink();
     }
 
@@ -35,32 +34,30 @@ public class CompressorController {
     public String decompress(@RequestParam(name = "file", required = true) MultipartFile file, Model model) throws IOException {
         Decompress decompress = new Decompress(file);
         if (decompress.checkHash()) {
-            model.addAttribute("link", decompress.getLink());
-            return "download";
+            return "redirect:/download?file=" + decompress.getLink();
         }
         model.addAttribute("message", "File was not decompressed correctly, it may be broken.");
         return "error";
     }
 
     @RequestMapping(value = "/arithmetic-compress", method = RequestMethod.POST)
-    public String Acompress(@RequestParam(name = "file", required = true) MultipartFile file, Model model) throws IOException {
-        //String crc = Hash.make(file);
-        //Path filepath = Paths.get("./src/main/resources/static/storage/", file.getOriginalFilename();
+    public String Acompress(@RequestParam(name = "file", required = true) MultipartFile file) throws IOException {
         File convFile = new File(System.getProperty("java.io.tmpdir")+"/"+file.getOriginalFilename());
         file.transferTo(convFile);
         ArithmeticCompress compress = new ArithmeticCompress(convFile);
-        //model.addAttribute("link", compress.getLink());
         return "redirect:/download?file=" + compress.getLink();
     }
 
     @RequestMapping(value = "/arithmetic-decompress", method = RequestMethod.POST)
     public String Adecompress(@RequestParam(name = "file", required = true) MultipartFile file, Model model) throws IOException {
         //String crc = Hash.make(file);
-        //Path filepath = Paths.get("./src/main/resources/static/storage/", file.getOriginalFilename();
         File convFile = new File(System.getProperty("java.io.tmpdir")+"/"+file.getOriginalFilename());
         file.transferTo(convFile);
-        ArithmeticDecompress compress = new ArithmeticDecompress(convFile);
-        //model.addAttribute("link", compress.getLink());
-        return "redirect:/download?file=" + compress.getLink();
+        ArithmeticDecompress decompress = new ArithmeticDecompress(convFile);
+        if (decompress.checkHash()) {
+            return "redirect:/download?file=" + decompress.getLink();
+        }
+        model.addAttribute("message", "File was not decompressed correctly, it may be broken.");
+        return "error";
     }
 }

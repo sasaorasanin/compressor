@@ -3,9 +3,15 @@
     <head>
         <meta charset="UTF-8">
         <title>Download File</title>
+        <link rel="stylesheet" href="./css/style.css">
+        <script src="./js/main.js" defer></script>
     </head>
     <body>
-    <a th:href="@{'./storage/'+${link}}" target="_blank" download>Download File</a>
-    <a th:href="@{./storage/compress1581599343.txt}" target="_blank" download>Download File</a>
+        <div class="container">
+            <div>
+                <h1>Download File</h1>
+                <a th:href="@{'./storage/'+${link}}" target="_blank" download>Download File</a> | <a href="./">Go Home</a>
+            </div>
+        </div>
     </body>
 </html>

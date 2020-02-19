@@ -7,13 +7,9 @@ package eu.nites.compressor.models.nayuki;
  * https://github.com/nayuki/Reference-arithmetic-coding
  */
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import eu.nites.compressor.models.Hash;
+
+import java.io.*;
 import java.util.Date;
 
 
@@ -28,6 +24,7 @@ import java.util.Date;
 public class ArithmeticCompress {
 
     private String filename;
+    private String code;
 
     public ArithmeticCompress(File inputFile) throws IOException {
         // Handle command line arguments
@@ -36,9 +33,9 @@ public class ArithmeticCompress {
             System.exit(1);
             return;
         }
-        this.filename = (new Date().getTime() / 1000) + "";
-        File outputFile = new File("./src/main/resources/static/storage/ar-compress-" + this.filename + ".txt");
-
+        this.code = Hash.make(inputFile);
+        this.filename = (new Date().getTime() / 1000) + "-" + this.code;
+        File outputFile = new File("./src/main/resources/static/storage/arcompress" + this.filename + ".txt");
         // Read input file once to compute symbol frequencies
         FrequencyTable freqs = getFrequencies(inputFile);
         freqs.increment(256);  // EOF symbol gets a frequency of 1
@@ -52,7 +49,7 @@ public class ArithmeticCompress {
     }
 
     public String getLink () {
-        return "ar-compress-" + this.filename + ".txt";
+        return "arcompress" + this.filename + ".txt";
     }
 
 

@@ -37,6 +37,8 @@ public class Decompress {
         return this.filename;
     }
 
+    // Start making range values by decode number gotten from compression
+
     private void run () {
         for(int i = 0; i < this.charsCount; i++) {
             if (i == 0) {
@@ -47,6 +49,8 @@ public class Decompress {
         }
     }
 
+    // Choose range for every character with decode number
+
     private void chooseRange () {
         for (int i = 0; i < this.rangeValues.size(); i++) {
             char probability = this.rangeValues.get(i).keySet().toArray()[0].toString().charAt(0);
@@ -56,6 +60,8 @@ public class Decompress {
             }
         }
     }
+
+    // Make ranges for all probabilities
 
     private void makeBetweenRangeValues () {
         this.rangeValues = new HashMap<>();
@@ -74,6 +80,8 @@ public class Decompress {
 
     }
 
+    // Make file after decompression
+
     private void makeFile () throws IOException {
         long time = new Date().getTime() / 1000;
         String filename = "decompress" + time + ".txt";
@@ -82,6 +90,8 @@ public class Decompress {
         writer.close();
         this.filename = filename;
     }
+
+    // Convert file to string to divide into crc, decode number, probabilities and character count
 
     private void fileToStringArray (MultipartFile file) throws IOException {
         String[] fileAsStringArray = new String(file.getBytes(), "UTF-8").split("##");
@@ -94,6 +104,8 @@ public class Decompress {
             throw new IllegalArgumentException("File cannot be decompressed!");
         }
     }
+
+    // Converting Gson to mixed map probabilities and creating first ranges
 
     private void makeProbabilities (String map) {
         Gson gson = new GsonBuilder().create();

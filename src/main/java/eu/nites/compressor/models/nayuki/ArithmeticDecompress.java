@@ -7,13 +7,9 @@ package eu.nites.compressor.models.nayuki;
  * https://github.com/nayuki/Reference-arithmetic-coding
  */
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import eu.nites.compressor.models.Hash;
+
+import java.io.*;
 import java.util.Date;
 
 
@@ -25,6 +21,7 @@ import java.util.Date;
 public class ArithmeticDecompress {
 
     private String filename;
+    private String code;
 
     public ArithmeticDecompress(File inputFile) throws IOException {
         // Handle command line arguments
@@ -33,8 +30,9 @@ public class ArithmeticDecompress {
             System.exit(1);
             return;
         }
-        this.filename = (new Date().getTime() / 1000) + "";
-        File outputFile = new File("./src/main/resources/static/storage/ar-decompress-" + this.filename + ".txt");
+        this.filename = "ar-decompress-" + (new Date().getTime() / 1000) + ".txt";
+        this.code = inputFile.getName().split("-")[1].replaceFirst("[.][^.]+$", "");
+        File outputFile = new File("./src/main/resources/static/storage/" + this.filename);
 
         // Perform file decompression
         try (BitInputStream in = new BitInputStream(new BufferedInputStream(new FileInputStream(inputFile)));
@@ -45,7 +43,11 @@ public class ArithmeticDecompress {
     }
 
     public String getLink () {
-        return "ar-decompress-" + this.filename + ".txt";
+        return this.filename;
+    }
+
+    public boolean checkHash () throws IOException {
+        return Hash.check(this.filename, this.code);
     }
 
 
